@@ -1,0 +1,399 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>2014深圳中小学学区划分,学位房查询系统</title>
+  <meta name="keywords" content="深圳学区房购买指南,福田名校学区房,南山学区房,深中学区房,实验学校学区房,中小学学区划分,学位房购买" />
+  <meta name="description" content="2014深圳各区中小学对应学区学位房查询系统,大家在购买学位房之前可以通过本系统查看所购学位房是否在学区内。" />
+  <base target="_blank" />
+  <!--topicHead-NO6-->
+  <link type="text/css" rel="stylesheet" href="http://www.xuedou.com/templets/xuedou/AllStuff/public/css/global2014.css"
+  />
+  <script type="text/javascript" src="http://www.xuedou.com/templets/xuedou/AllStuff/public/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" src="http://www.xuedou.com/templets/xuedou/AllStuff/public/js/topic-tools.js"></script>
+  <script type="text/javascript" src="http://www.xuedou.com/templets/xuedou/AllStuff/public/topic-all.js"></script>
+  <script type="text/javascript" src="http://www.xuedou.com/templets/xuedou/AllStuff/public/js/skylogin.js"></script>
+  <!--topicHead-NO6 End-->
+  <link type="text/css" rel="stylesheet" href="http://www.xuedou.com/templets/xuedou/AllStuff/xuedou/css/xuedou-v2.0-footer.css"
+  />
+  <link type="text/css" rel="stylesheet" href="/html/cxxt/Public/css/xqcx.css">
+  <script>
+    function callData(area,schtype,school){
+	if(area == "罗湖区"){
+		var lhqhtml = "<tr><th width='166'>学校名称</th><th> 招生学区范围</th></tr>";
+		var schhtml = "<option value='--如下图--'>--如下图--</option>";
+		lhqhtml += "<tr><td colspan='2'><img src='/html/cxxt/Public/images/lhq.jpg' style='width: 1000px; height: 600px;'></td></tr>";
+		lhqhtml += "<tr><td colspan='2' class='center'><a href='http://www.xuedou.com/uploads/allimg/140415/35_1341417501.jpg' target='_blank'>点击查看大图</a></td></tr>";
+		$(".table table").html(lhqhtml);
+		$(".school select").html(schhtml);
+		return false;
+	}
+	if(schtype == "不限") schtype = '';
+		$.ajax({
+			url:'/html/cxxt/index.php/Xqcx/backSch',
+			type:'post',
+			dataType:'json',
+			json:'callback',
+			data:{"area":area,"schtype":schtype},
+			success:function(data){
+				var shtml = "<option value='--请选择学校--'>--请选择学校--</option>";
+				$.each(data,function(i,n){
+					shtml += "<option value='"+ n +"'>" + n + "</option>";
+				})
+				$(".school select").html(shtml);
+			}
+		})
+}
+function zsxx(obj){
+	var school = obj.val();
+	var area = $(".area").find(".licur").text();
+	if(school == "--请选择学校--"){
+		alert("请选择要查询的学校！");
+		return false;
+	}
+	$.ajax({
+			url:'/html/cxxt/index.php/Xqcx/backData',
+			type:'post',
+			dataType:'json',
+			json:'callback',
+			data:{"area":area,"school":school},
+			success:function(data){
+				var dhtml = "<tr><th width='166'>学校名称</th><th> 招生学区范围</th></tr>";
+				$.each(data,function(i,n){
+					dhtml += "<tr><td class='center'>"+ i +"</td><td>"+ n +"</td></tr>";
+				})
+				$(".table table").html(dhtml);
+			}
+		})
+}
+	$(function(){
+		$(".table tr:even").children("td").css("background-color","#f8f8f8");
+		// 点击选中
+		$(".select table li").click(function() {
+			$(this).addClass("licur").siblings("li").removeClass("licur");
+		});
+		$(".area li").click(function(){
+			var area = $(this).text();
+			var schtype = $(".schtype").find(".licur").text();
+			callData(area,schtype);
+		});
+		$(".schtype li").click(function(){
+			var schtype = $(this).text();
+			var area = $(".area").find(".licur").text();
+			callData(area,schtype);
+		});
+		$(".seachbtn").click(function(){
+			$("#resbox").hide();
+			var village = $("input[name='village']").val();
+			if(village.length < 2 || village.length > 200){
+				alert('请输入2到200个字符搜索！');
+				$("input[name='village']").focus();
+				return false;
+			}
+			var dhtml = "<tr><th width='166'>学校名称</th><th> 招生学区范围</th></tr>";
+			$.ajax({
+				url:'/html/cxxt/index.php/Xqcx/backVil',
+				type:'post',
+				dataType:'json',
+				json:'callback',
+				data:{"village":village},
+				success:function(data){
+					if(data){
+						for(i=0;i<data.length;i++){
+							dhtml += "<tr><td class='center'>"+ data[i]['school'] +"</td><td>"+ data[i]['village'] +"</td></tr>";
+						}
+						$(".table table").html(dhtml);
+					}else{
+						alert('未查询到相关楼盘信息！');
+					}
+				}
+			})
+		})
+		//模糊匹配
+		$("input[name='village']").keyup(function(){
+			var village = $(this).val();
+			if(village.trim() == ''){
+				$('#resbox').hide();
+				return false;
+			}
+			$.ajax({
+				url:'/html/cxxt/index.php/Xqcx/backVil',
+				type:'post',
+				dataType:'json',
+				json:'callback',
+				data:{"village":village,"like":'like'},
+				success:function(data){
+					$('#resbox').show();
+					if(data){
+						var sHtml = '';
+						$.each(data,function(i,n){
+							sHtml += "<li>"+ n +"</li>";
+						})
+						$('#resbox ul').html(sHtml);
+					}else{
+						$('#resbox ul').html("<li>没有相关学校</li>");
+					}
+				}
+			})
+
+		})
+		$('#resbox ul li').live('click',function(){
+			$("input[name='village']").val($(this).text());
+			$('#resbox').hide();
+		})
+	})
+
+  </script>
+</head>
+
+<body>
+  <!--top-x-->
+  <script type="text/javascript" src="http://www.xuedou.com/templets/xuedou/AllStuff/public/footer/sy-top-x.js"></script>
+  <!--top-x End-->
+  <!--container-->
+  <div class="tpcontainer">
+    <!--header-->
+    <div class="header">
+      <h1>深圳各学校学区查询系统</h1></div>
+    <!--header end-->
+    <!--part01-->
+    <div class="cxmain">
+      <!--select-->
+      <div class="select">
+        <div class="tit">条件筛选</div>
+        <table>
+          <tr class="area">
+            <th width="136">学区区域</th>
+            <td>
+              <ul>
+                <li class="licur">福田区</li>
+                <li>罗湖区</li>
+                <li>南山区</li>
+                <li>宝安区</li>
+                <li>龙岗区</li>
+                <li>龙华区</li>
+                <li>其它区</li>
+              </ul>
+            </td>
+          </tr>
+          <tr class="schtype">
+            <th>招生年级</th>
+            <td>
+              <ul>
+                <li class="licur">不限</li>
+                <li>小一</li>
+                <li>初一</li>
+              </ul>
+            </td>
+          </tr>
+          <tr class="school">
+            <th>招生学校</th>
+            <td>
+              <select name="school" id="school" onchange="return zsxx($('#school'));">
+                <option value="--请选择学校--">--请选择学校--</option>
+                <option value="上步中学">上步中学</option>
+                <option value="上步小学">上步小学</option>
+                <option value="上沙中学">上沙中学</option>
+                <option value="上沙小学">上沙小学</option>
+                <option value="下沙小学">下沙小学</option>
+                <option value="众孚小学">众孚小学</option>
+                <option value="全海小学">全海小学</option>
+                <option value="北环中学">北环中学</option>
+                <option value="华富中学">华富中学</option>
+                <option value="华富小学">华富小学</option>
+                <option value="华新小学">华新小学</option>
+                <option value="南华中学">南华中学</option>
+                <option value="南华小学">南华小学</option>
+                <option value="南园小学">南园小学</option>
+                <option value="园岭外语小学">园岭外语小学</option>
+                <option value="园岭实验小学">园岭实验小学</option>
+                <option value="园岭小学">园岭小学</option>
+                <option value="天健小学">天健小学</option>
+                <option value="实验初中部">实验初中部</option>
+                <option value="实验小学">实验小学</option>
+                <option value="岗厦小学">岗厦小学</option>
+                <option value="彩田学校初中部">彩田学校初中部</option>
+                <option value="彩田学校小学部">彩田学校小学部</option>
+                <option value="新沙小学">新沙小学</option>
+                <option value="新洲中学">新洲中学</option>
+                <option value="新洲小学">新洲小学</option>
+                <option value="新莲小学">新莲小学</option>
+                <option value="景田小学">景田小学</option>
+                <option value="景秀中学">景秀中学</option>
+                <option value="景秀小学">景秀小学</option>
+                <option value="景莲小学">景莲小学</option>
+                <option value="景鹏小学">景鹏小学</option>
+                <option value="景龙小学">景龙小学</option>
+                <option value="梅丽小学">梅丽小学</option>
+                <option value="梅华小学">梅华小学</option>
+                <option value="梅园小学">梅园小学</option>
+                <option value="梅山中学">梅山中学</option>
+                <option value="梅山小学">梅山小学</option>
+                <option value="梅林小学">梅林小学</option>
+                <option value="水围小学">水围小学</option>
+                <option value="狮岭小学">狮岭小学</option>
+                <option value="百花小学">百花小学</option>
+                <option value="皇岗中学">皇岗中学</option>
+                <option value="皇岗小学">皇岗小学</option>
+                <option value="益强小学">益强小学</option>
+                <option value="益田小学">益田小学</option>
+                <option value="石厦学校初中部">石厦学校初中部</option>
+                <option value="石厦学校小学部">石厦学校小学部</option>
+                <option value="碧海小学">碧海小学</option>
+                <option value="福华小学">福华小学</option>
+                <option value="福南小学">福南小学</option>
+                <option value="福强小学">福强小学</option>
+                <option value="福新小学">福新小学</option>
+                <option value="福民小学">福民小学</option>
+                <option value="福田外语侨香校区">福田外语侨香校区</option>
+                <option value="福田外语小学部">福田外语小学部</option>
+                <option value="福田外语景田校区">福田外语景田校区</option>
+                <option value="福田小学">福田小学</option>
+                <option value="竹园小学">竹园小学</option>
+                <option value="竹林中学">竹林中学</option>
+                <option value="竹林小学">竹林小学</option>
+                <option value="第三高级初中部">第三高级初中部</option>
+                <option value="红岭南园">红岭南园</option>
+                <option value="红岭园岭校区">红岭园岭校区</option>
+                <option value="红岭石厦校区">红岭石厦校区</option>
+                <option value="绿洲小学">绿洲小学</option>
+                <option value="美莲小学">美莲小学</option>
+                <option value="翰林学校初中部">翰林学校初中部</option>
+                <option value="翰林学校小学部">翰林学校小学部</option>
+                <option value="荔园外语东校区">荔园外语东校区</option>
+                <option value="荔园外语西校区">荔园外语西校区</option>
+                <option value="荔园小学北校区">荔园小学北校区</option>
+                <option value="荔园小学南校区">荔园小学南校区</option>
+                <option value="荔轩小学">荔轩小学</option>
+                <option value="莲花中学南校区">莲花中学南校区</option>
+                <option value="莲花北校区">莲花北校区</option>
+                <option value="莲花小学">莲花小学</option>
+                <option value="高级中学初中部">高级中学初中部</option>
+                <option value="黄埔学校初中部">黄埔学校初中部</option>
+                <option value="黄埔学校小学部">黄埔学校小学部</option>
+              </select>
+            </td>
+          </tr>
+          <tr class="village">
+            <th>楼盘</th>
+            <td>
+              <div id="inputbox">
+                <input type="text" placeholder="请输入楼盘名称" name="village"><a href="javascript:;" target="_self" class="seachbtn">搜索</a>
+                <div id="resbox" style="display:none;">
+                  <ul>
+                    <li>aaaa</li>
+                    <li>bbbb</li>
+                    <li>cccc</li>
+                    <li>dddd</li>
+                  </ul>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <!--select End-->
+      <div class="table">
+        <table>
+          <tr>
+            <th width="166"> 学校名称</th>
+            <th> 招生学区范围</th>
+          </tr>
+          <tr>
+            <td class="center" colspan="2">请选择查询条件</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!--part01 end-->
+  </div>
+  <!--container end-->
+  <!--bottom-->
+  <div class="bottom">
+    <!--xdlink-->
+    <div class="xdlink">
+      <div class="btmain">
+        <div class="btxd">
+          <a href="http://www.xuedou.com/"></a>
+        </div>
+        <dl class="btyj"><dt><a href="http://yj.xuedou.com/">幼教</a></dt>
+          <dd>
+            <ul>
+              <li><a href="http://yj.xuedou.com/ysx/">幼升小</a></li>
+              <li><a href="http://yj.xuedou.com/yeyy/"> 幼儿英语</a></li>
+              <li><a href="http://yj.xuedou.com/qzjy/"> 亲子教育</a></li>
+              <li><a href="http://yj.xuedou.com/szzdxx/"> 重点小学</a></li>
+              <li><a href="http://yj.xuedou.com/szzdyey/"> 重点幼儿园</a></li>
+            </ul>
+          </dd>
+        </dl>
+        <dl class="btxx"><dt><a href="http://xx.xuedou.com/">小学</a></dt>
+          <dd>
+            <ul>
+              <li><a href="http://xx.xuedou.com/xsc/">小升初</a></li>
+              <li><a href="http://xx.xuedou.com/bszq/"> 深圳杯赛</a></li>
+              <li><a href="http://xx.xuedou.com/etjy/"> 儿童教育</a></li>
+              <li><a href="http://xx.xuedou.com/xxzlk/xx/"> 小学题库</a></li>
+              <li><a href="http://xx.xuedou.com/szzdcz/"> 重点初中</a></li>
+            </ul>
+          </dd>
+        </dl>
+        <dl class="btzk"><dt><a href="http://zk.xuedou.com/">中考</a></dt>
+          <dd>
+            <ul>
+              <li><a href="http://zk.xuedou.com/zkbk/">中考报考</a></li>
+              <li><a href="http://zk.xuedou.com/zkbek/">中考备考</a></li>
+              <li><a href="http://zk.xuedou.com/czjs/"> 初中竞赛</a></li>
+              <li><a href="http://zk.xuedou.com/szzdgz/"> 重点高中</a></li>
+              <li><a href="http://zk.xuedou.com/jtjy/"> 家庭教育</a></li>
+              <li><a href="http://zk.xuedou.com/cztk/"> 初中题库</a></li>
+            </ul>
+          </dd>
+        </dl>
+        <dl class="btgk"><dt><a href="http://gk.xuedou.com/">高考</a></dt>
+          <dd>
+            <ul>
+              <li><a href="http://gk.xuedou.com/gkzx/">高考资讯</a></li>
+              <li><a href="http://gk.xuedou.com/gkbk/">高考备考</a></li>
+              <li><a href="http://gk.xuedou.com/gkbks/">高考报考</a></li>
+              <li><a href="http://gk.xuedou.com/zddx/">重点大学</a></li>
+            </ul>
+          </dd>
+        </dl>
+        <dl class="btbbs"><dt><a href="http://bbs.xuedou.com/">学豆社区</a></dt>
+          <dd>
+            <ul>
+              <li><a href="http://bbs.xuedou.com/forum-2-1.html">2014幼升小</a></li>
+              <li><a href="http://bbs.xuedou.com/forum-8-1.html"> 2014小升初</a></li>
+              <li><a href="http://bbs.xuedou.com/forum-11-1.html"> 2014中考</a></li>
+              <li><a href="http://bbs.xuedou.com/forum-56-1.html"> 2014高考</a></li>
+              <li><a href="http://bbs.xuedou.com/forum-72-1.html"> 出国留学</a></li>
+              <li><a href="http://bbs.xuedou.com/forum.php?gid=79"> 学豆艺术</a></li>
+            </ul>
+          </dd>
+        </dl>
+      </div>
+    </div>
+    <!--xdlink end-->
+    <!-- footer-NO7-->
+    <script type="text/javascript" src="http://www.xuedou.com/templets/xuedou/AllStuff/public/footer/footer-NO7.js"></script>
+    <!-- footer-NO7 End-->
+  </div>
+  <!--bottom end-->
+  <!-- Baidu Button BEGIN -->
+  <script>
+    window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"1","bdPos":"right","bdTop":"100"},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+  </script>
+  <!-- Baidu Button END -->
+  <!--to top-->
+  <div class="backToTop"></div>
+  <!--to top end-->
+  <!-- cnzz 流量统计 -->
+  <div style="display:none;">
+    <script src="http://s23.cnzz.com/stat.php?id=5470203&web_id=5470203" language="JavaScript"></script>
+  </div>
+  <!-- cnzz 流量统计 end -->
+</body>
+
+</html>
