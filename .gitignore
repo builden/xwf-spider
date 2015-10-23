@@ -75,6 +75,6 @@ $RECYCLE.BIN/
 *.lnk
 
 frameworks/**
-src/app.*
+dist/**
 typings/**
 publish/**
