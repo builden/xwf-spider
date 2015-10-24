@@ -1,33 +1,35 @@
+import './css/xwf.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {ButtonToolbar, Button} from 'react-bootstrap';
+import {Grid, Row, Col} from 'react-bootstrap';
+import LoadingButton from './component/loading-button.jsx';
 
-const buttonsInstance = (
-  <ButtonToolbar>
-    {/* Standard button */}
-    <Button>Default</Button>
+const mountNode = document.getElementById('container');
 
-    {/* Provides extra visual weight and identifies the primary action in a set of buttons */}
-    <Button bsStyle="primary">Primary</Button>
 
-    {/* Indicates a successful or positive action */}
-    <Button bsStyle="success">Success</Button>
+const gridInstance = (
+  <Grid>
+    <Row className="show-grid">
+      <Col xs={12} md={8}><code>&lt;{'Col xs={12} md={8}'} /&gt;</code></Col>
+      <Col xs={6} md={4}><code>&lt;{'Col xs={6} md={4}'} /&gt;</code></Col>
+    </Row>
 
-    {/* Contextual button for informational alert messages */}
-    <Button bsStyle="info">Info</Button>
+    <Row className="show-grid">
+      <Col xs={6} md={4}><code>&lt;{'Col xs={6} md={4}'} /&gt;</code></Col>
+      <Col xs={6} md={4}><code>&lt;{'Col xs={6} md={4}'} /&gt;</code></Col>
+      <Col xs={6} md={4}><code>&lt;{'Col xs={6} md={4}'} /&gt;</code></Col>
+    </Row>
 
-    {/* Indicates caution should be taken with this action */}
-    <Button bsStyle="warning">Warning</Button>
+    <Row className="show-grid">
+      <Col xs={6} xsOffset={6}><code>&lt;{'Col xs={6} xsOffset={6}'} /&gt;</code></Col>
+    </Row>
 
-    {/* Indicates a dangerous or potentially negative action */}
-    <Button bsStyle="danger">Danger</Button>
-
-    {/* Deemphasize a button by making it look like a link while maintaining button behavior */}
-    <Button bsStyle="link">Link</Button>
-  </ButtonToolbar>
+    <Row className="show-grid">
+      <Col md={6} mdPush={6}><code>&lt;{'Col md={6} mdPush={6}'} /&gt;</code></Col>
+      <Col md={6} mdPull={6}><code>&lt;{'Col md={6} mdPull={6}'} /&gt;</code></Col>
+      <LoadingButton bsStyle="wahaha" />
+    </Row>
+  </Grid>
 );
 
-ReactDOM.render(
-  buttonsInstance,
-  document.getElementById('container')
-);
+ReactDOM.render(gridInstance, mountNode);

@@ -16,14 +16,14 @@ const config = {
         test: /\.js$/, exclude: /node_modules/, loader: 'babel?stage=1&optional=runtime',
       },
       {
-        test: /\.jsx$/, exclude: /node_modules/, loader: 'babel',
+        test: /\.jsx$/, exclude: /node_modules/, loader: 'babel?stage=1&optional=runtime',
       },
       {
         test: /\.css$/, loader: 'style!css',
       },
       {
         test: /\.(eot|woff2|woff|ttf|svg)$/, loader: 'raw',
-      }
+      },
     ],
   },
 
