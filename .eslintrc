@@ -3,7 +3,8 @@
 
   "rules": {
     "id-length": [2, {"properties": "never", "exceptions": ["x", "y", "_", "$", "s", "e", "i", "j", "k", "v"]}],
-    "no-console": 0
+    "no-console": 0,
+    "indent": [2, 2, {"SwitchCase": 1}]
   },
 
   "env": {

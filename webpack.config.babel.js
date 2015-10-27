@@ -1,7 +1,7 @@
 import webpack from 'webpack';
 
 const config = {
-  entry: __dirname + '/src/app.jsx',
+  entry: __dirname + '/src/index.js',
 
   output: {
     path: __dirname + '/dist',
