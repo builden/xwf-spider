@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "webpack",
-    "dev": "webpack-dev-server --dev-tool eval --progress --colors --hot --content-base ."
+    "build": "webpack --progress --colors --profile",
+    "dev": "webpack-dev-server --dev-tool eval --progress --colors --content-base ."
   },
   "author": "builden",
   "license": "MIT",

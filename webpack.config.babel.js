@@ -10,12 +10,15 @@ const deps = [
 ];
 
 const config = {
-  entry: ['webpack/hot/dev-server', __dirname + '/src/index.js'],
+  entry: {
+    app: __dirname + '/src/index.js',
+    // vendors: [],
+  },
 
   output: {
     path: __dirname + '/dist',
-    publicPath: '/dist/', // for webpack-dev-server 
-    filename: 'app.js',
+    publicPath: '/dist/', // for webpack-dev-server
+    filename: '[name].js',
   },
 
   devtool: 'source-map',
@@ -45,24 +48,22 @@ const config = {
   },
 
   plugins: [
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-      },
-      output: {
-        comments: false,
-        semicolons: true,
-      },
-      sourceMap: true,
-    }),
+    // new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js'),
   ],
 };
-
+/*
 deps.forEach((dep) => {
   const depPath = path.resolve(nodeModulesDir, dep);
-  config.resolve.alias[dep.split(path.sep)[0]] = depPath;
+  const depName = dep.split(path.sep)[0];
+  config.resolve.alias[depName] = depPath;
   config.module.noParse.push(depPath);
+  config.entry.vendors.push(depName);
 });
+const domPath = path.resolve(nodeModulesDir, 'react/lib/ReactDOM.js');
+config.resolve.alias['react-dom'] = domPath;
+config.module.noParse.push(domPath);
+config.entry.vendors.push('react-dom');
+console.log(config);
+//*/
 
 export default config;
