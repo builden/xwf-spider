@@ -3,44 +3,40 @@ import NavMain from '../components/NavMain';
 import Logo from '../components/Logo';
 import SearchBar from '../components/SearchBar';
 import ConditionGroup from '../components/ConditionGroup';
-import {Grid, Row, Col, Panel} from 'react-bootstrap';
+import SearchResult from '../components/SearchResult';
+import {Grid, Row, Col} from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { selectArea, selSchtype } from '../actions';
+import areaSchools from '../../db/area-schools.json';
+import schoolVillage from '../../db/school-village.json';
 
-export default class App extends React.Component {
+class App extends React.Component {
+  onSearch = (text) => {
+    console.log(this.props);
+  }
+
   render() {
+    const { dispatch, area, schtype } = this.props;
+    const results = [];
+    results.push({header: schtype, ctx: areaSchools[area][schtype]});
     return (
       <div>
         <NavMain />
         <Logo/>
         <Grid>
           <Row>
-            <Col md={8} mdOffset={2} xs={12}><SearchBar/></Col>
+            <Col md={8} mdOffset={2} xs={12}><SearchBar onSearch={this.onSearch}/></Col>
           </Row>
           <Row>
             <Col md={8} mdOffset={2} xs={12}>
-              <ConditionGroup />
+              <ConditionGroup area={area} schtype={schtype}
+                              onSelectArea={ (area) => dispatch(selectArea(area)) }
+                              onSelectSchtype={ (schtype) => dispatch(selSchtype(schtype)) }/>
             </Col>
           </Row>
           <Row>
             <Col md={8} mdOffset={2} xs={12}>
-              <Panel header="育才小学" bsStyle="primary">
-                <a href="#">小区1</a>，<a href="#">小区2</a>，<a href="#">小区3</a>
-              </Panel>
-
-              <Panel header="育才中学" bsStyle="success">
-                Panel content
-              </Panel>
-
-              <Panel header="学校3" bsStyle="info">
-                Panel content
-              </Panel>
-
-              <Panel header="学校四" bsStyle="warning">
-                Panel content
-              </Panel>
-
-              <Panel header="学校5" bsStyle="danger">
-                Panel content
-              </Panel>
+              <SearchResult results={results}/>
             </Col>
           </Row>
         </Grid>
@@ -48,3 +44,12 @@ export default class App extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  const { area, schtype } = state;
+  return {
+    area,
+    schtype,
+  };
+}
+export default connect(mapStateToProps)(App);

@@ -33,6 +33,9 @@ const config = {
       {
         test: /\.(eot|woff2|woff|ttf|svg)$/, loader: 'raw',
       },
+      {
+        test: /\.(json)/, loader: 'json',
+      },
     ],
     // 防止重复去解析
     noParse: [],
