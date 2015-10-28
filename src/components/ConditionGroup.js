@@ -14,11 +14,15 @@ export default class ConditionGroup extends React.Component {
   }
 
   onSelectArea = (event, eventKey) => {
-    this.setState({ areaKey: eventKey });
+    if (this.state.areaKey !== eventKey) {
+      this.setState({ areaKey: eventKey });
+    }
   }
 
   onSelectSchType = (event, eventKey) => {
-    this.setState({ schtypeKey: eventKey });
+    if (this.state.schtypeKey !== eventKey) {
+      this.setState({ schtypeKey: eventKey });
+    }
   }
 
   render() {

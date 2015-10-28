@@ -1,17 +1,10 @@
 import webpack from 'webpack';
 import path from 'path';
-const nodeModulesDir = path.join(__dirname, 'node_modules');
-
-// 防止重复去解析
-const deps = [
-  'react/dist/react.min.js',
-  'react-dom/dist/react-dom.min.js',
-  'react-bootstrap/dist/react-bootstrap.min.js',
-];
 
 const config = {
   entry: {
-    app: __dirname + '/src/index.js',
+    app: ['webpack/hot/dev-server', __dirname + '/src/index.js'],
+    vendors: ['react', 'react-dom', 'react-bootstrap'],
     // vendors: [],
   },
 
@@ -31,10 +24,8 @@ const config = {
   module: {
     loaders: [
       {
-        test: /\.js$/, exclude: /node_modules/, loader: 'babel?stage=1&optional=runtime',
-      },
-      {
-        test: /\.jsx$/, exclude: /node_modules/, loader: 'babel?stage=1&optional=runtime',
+        test: /\.(js|jsx)$/, exclude: /node_modules/,
+        loaders: ['react-hot', 'babel?stage=1&optional=runtime'],
       },
       {
         test: /\.css$/, loader: 'style!css',
@@ -48,21 +39,23 @@ const config = {
   },
 
   plugins: [
-    // new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js'),
+    new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js'),
   ],
 };
 /*
+// 防止重复去解析
+const nodeModulesDir = path.join(__dirname, 'node_modules');
+const deps = [
+  { name: 'react', file: 'react/dist/react.min.js' },
+  { name: 'react-dom', file: 'react-dom/dist/react-dom.min.js' },
+  { name: 'react-bootstrap', file: 'react-bootstrap/dist/react-bootstrap.min.js' },
+];
 deps.forEach((dep) => {
-  const depPath = path.resolve(nodeModulesDir, dep);
-  const depName = dep.split(path.sep)[0];
-  config.resolve.alias[depName] = depPath;
+  const depPath = path.resolve(nodeModulesDir, dep.file);
+  config.resolve.alias[dep.name] = depPath;
   config.module.noParse.push(depPath);
-  config.entry.vendors.push(depName);
+  config.entry.vendors.push(dep.name);
 });
-const domPath = path.resolve(nodeModulesDir, 'react/lib/ReactDOM.js');
-config.resolve.alias['react-dom'] = domPath;
-config.module.noParse.push(domPath);
-config.entry.vendors.push('react-dom');
 console.log(config);
 //*/
 
