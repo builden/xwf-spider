@@ -1,9 +1,10 @@
-import webpack from 'webpack';
-import path from 'path';
+const webpack = require('webpack');
+// const path = require('path');
 
 const config = {
   entry: {
-    app: ['webpack/hot/dev-server', __dirname + '/src/index.js'],
+    app: [ __dirname + '/src/index.js'],
+    // app: ['webpack/hot/dev-server', __dirname + '/src/index.js'],
     vendors: ['react', 'react-dom', 'react-bootstrap'],
     // vendors: [],
   },
@@ -62,4 +63,4 @@ deps.forEach((dep) => {
 console.log(config);
 //*/
 
-export default config;
+module.exports = config;
